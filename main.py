@@ -35,22 +35,25 @@ def fetch_douban_rss():
     return requests.get(CONFIG['douban-rss'], headers=headers).text
 
 def inject_pt_rss_sites(douban_rss_content):
-    _douban_title_pattern = re.compile('^<title>(在看|想看|看过)(.*)</title>$')
+    _douban_title_pattern = re.compile('^<title>(在看|想看|看过)(.*)</title>')
     result = ""
-    for part in re.split("(<title>.*?</title>)", douban_rss_content):
+    for part in re.split(r"(<title>(.|\s)+?</description>)", douban_rss_content):
+        # fixme: 每个正则匹配多出了一个">"元素，先暂时去掉，后续排查
+        if part.startswith(">"):
+            continue
         result += part
 
-        matcher = _douban_title_pattern.search(part)
-        if matcher is None:
+        title_matcher = _douban_title_pattern.search(part)
+        if title_matcher is None:
             continue
 
-        title = matcher.group(2)
+        title = title_matcher.group(2)
         # 将影片标题特殊字符转换成空格，再用pt的[和]方式进行搜索，防止因特殊字符造成搜索不出结果
         title = re.sub("[^0-9A-Za-z\u4e00-\u9fa5]", " ", title)
         for pt_template in CONFIG['pt-templates']:
-            line = f"\n<{pt_template['name']}>{requote_uri(pt_template['template'].format(title))}</{pt_template['name']}>"
-            line = line.replace("&amp;", "&").replace("&", "&amp;")
-            result += line
+            href = requote_uri(pt_template['template'].format(title)).replace("&amp;", "&").replace("&", "&amp;")
+            description_append = f"<p><span>{pt_template['name']}: </span><a href=\"{href}\">{href}</a></p>"
+            result = result[:-17] + description_append + result[-17:]
 
     return result
 
