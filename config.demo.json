@@ -1,0 +1,9 @@
+{
+    "douban-rss": "https://www.douban.com/feed/people/<your-douban-id>/interests",
+    "pt-templates": [
+        {
+            "name": "tjupt",
+            "template": "https://tjupt.org/torrentrss.php?rows=10&isize=1&search={}&passkey=<your-passkey>&linktype=dl"
+        }
+    ]
+}
