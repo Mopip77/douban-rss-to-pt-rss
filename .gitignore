@@ -1,2 +1,4 @@
-config.json
+.envrc
 *.xml
+last_record_title
+__pycache__/

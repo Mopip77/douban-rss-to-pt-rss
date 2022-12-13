@@ -1,63 +1,58 @@
 #!/usr/bin/env python3
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from requests.utils import requote_uri
-
-import sys
-import requests
-import json
+import os
+import douban
+import logging
+import qbittorrent
+import sites
 import re
 
-CONFIG = {}
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
-class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+DEFAULT_TITLE = "_"
+LAST_RECORD_TITLE_FILE = "last_record_title"
+PT_SITES = set([x.strip() for x in os.getenv('SITES').split(",")])
 
-    def do_GET(self):
-        douban_rss_content = fetch_douban_rss()
-        modifed_xml = inject_pt_rss_sites(douban_rss_content)
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/xml; charset=utf-8')
-        self.end_headers()
-        self.wfile.write(bytes(modifed_xml, encoding='utf-8'))
+def handle_title(title: str):
+    """convert title to rss subscription url, and send to qbittorrent
 
-def load_config():
-    global CONFIG 
-    CONFIG = json.load(open('config.json', 'r'))
-    # config validate
-    if 'douban-rss' not in CONFIG:
-        raise SyntaxError("`douban-rss` is required in config file.")
-    if 'pt-templates' not in CONFIG or type(CONFIG['pt-templates']) != list or len(CONFIG['pt-templates']) == 0:
-        raise SyntaxError("`pt-templates` is required in config file, and at least one element.")
+    Args:
+        title (str): movie title
+    """
+    site_map = sites.load_sites()
+    # pre-handle, remove the puntuation for better match
+    pre_handled_title = re.sub("[^0-9A-Za-z\u4e00-\u9fa5]", " ", title)
+    for site in PT_SITES:
+        if site not in site_map:
+            logging.warning(f"<{site}> 还不支持，跳过")
+        else:
+            url = site_map[site].format(query=pre_handled_title, size=10, passkey=os.getenv(f"{site}_passkey"))
+            # send to qb
+            qbittorrent.add_folder(site)
+            qbittorrent.add_rss(url, f"{site}\\{title}")
 
-def fetch_douban_rss():
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
-    }
-    return requests.get(CONFIG['douban-rss'], headers=headers).text
-
-def inject_pt_rss_sites(douban_rss_content):
-    _douban_title_pattern = re.compile('^<title>(在看|想看|看过)(.*)</title>')
-    result = ""
-    for part in re.split(r"(<title>(.|\s)+?</description>)", douban_rss_content):
-        # fixme: 每个正则匹配多出了一个">"元素，先暂时去掉，后续排查
-        if part.startswith(">"):
-            continue
-        result += part
-
-        title_matcher = _douban_title_pattern.search(part)
-        if title_matcher is None:
-            continue
-
-        title = title_matcher.group(2)
-        # 将影片标题特殊字符转换成空格，再用pt的[和]方式进行搜索，防止因特殊字符造成搜索不出结果
-        title = re.sub("[^0-9A-Za-z\u4e00-\u9fa5]", " ", title)
-        for pt_template in CONFIG['pt-templates']:
-            href = requote_uri(pt_template['template'].format(title)).replace("&amp;", "&").replace("&", "&amp;")
-            description_append = f"<p><span>{pt_template['name']}: </span><a href=\"{href}\">{href}</a></p>"
-            result = result[:-17] + description_append + result[-17:]
-
-    return result
-
+def main():
+    douban_rss_content = douban.crawl_douban_rss(os.environ.get('DOUBAN_USER_ID'))
+    wanna_watch_titles = douban.parse_douban_rss(douban_rss_content)
+    # load last record title
+    if not os.path.exists(LAST_RECORD_TITLE_FILE):
+        # first run, do not handle the previous titles
+        last_record_title = DEFAULT_TITLE
+    else:
+        last_record_title = open(LAST_RECORD_TITLE_FILE, 'r').readline()
+        logging.info(f"上次处理到 [{last_record_title}]")
+    
+    handled = False
+    for title in wanna_watch_titles:
+        if not handled and last_record_title != title:
+            logging.info(f"正在发送 [{title}] 在 <{os.environ.get('PT')}> 的rss链接到qb")
+            handle_title(title)
+        else:
+            logging.info(f"跳过 [{title}] ，之前已被处理")
+            handled = True
+    # save the newest title to file
+    with open(LAST_RECORD_TITLE_FILE, 'w') as ff:
+        newest_title = wanna_watch_titles[0] if len(wanna_watch_titles) > 0 else last_record_title
+        ff.write(newest_title)
+            
 if __name__ == '__main__':
-    load_config()
-    httpd = HTTPServer(('0.0.0.0', int(sys.argv[1])), SimpleHTTPRequestHandler)
-    httpd.serve_forever()
+    main()
