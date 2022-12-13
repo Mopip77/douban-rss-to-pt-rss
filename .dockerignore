@@ -3,5 +3,5 @@
 !*.sh
 !*.py
 !*.json
-!CRON
+!config/
 !requirements.txt
