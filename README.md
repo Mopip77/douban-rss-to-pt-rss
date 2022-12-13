@@ -19,13 +19,13 @@
 | QB_URL         | http://qb.xxx.com | qb地址                                                                           |
 | QB_USER        | qbit              | qb用户名                                                                         |
 | QB_PWD         | 12345             | qb密码                                                                           |
-| tjupt_passkey  | 3j3oi32onf        | 各pt站的passkey，key的格式为 <pt站名>_passkey，例如 tjupt_passkey, mteam_passkey |
+| tjupt_passkey  | 3j3oi32onf        | 各pt站的passkey，key的格式为 <pt站名>_passkey，例如 tjupt_passkey, chdbits_passkey |
 
 
 ## 当前支持的pt站名
 
 - tjupt
-- mteam
+- chdbits
 
 ## 运行
 
@@ -58,10 +58,10 @@ services:
     environment:
       - TZ=Asia/Shanghai
       - DOUBAN_USER_ID=12345
-      - SITES=tjupt,mteam
+      - SITES=tjupt,chdbits
       - QB_URL=http://127.0.0.1:8083
       - QB_USERNAME=username
       - QB_PWD=password
       - tjupt_passkey=0E43BD4F134F31BCB0C4
-      - mteam_passkey=6B6286D49D4F4E33D5EF
+      - chdbits_passkey=6B6286D49D4F4E33D5EF
 ```

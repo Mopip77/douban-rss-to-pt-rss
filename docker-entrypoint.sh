@@ -17,7 +17,7 @@ if [ ! -e "config/sites.json" ]; then
   cat > config/sites.json <<EOF
 {
     "tjupt": "https://tjupt.org/torrentrss.php?rows={size}&isize=1&search={query}&passkey={passkey}&linktype=dl",
-    "mteam": "https://pt.m-team.cc/torrentrss.php?rows={size}&isize=1&search={query}&passkey={passkey}&linktype=dl"
+    "chdbits": "https://chdbits.co/torrentrss.php?rows={size}&isize=1&search={query}&passkey={passkey}&linktype=dl"
 }
 EOF
 fi
