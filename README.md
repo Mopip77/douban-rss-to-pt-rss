@@ -29,17 +29,6 @@
 
 ## 运行
 
-#### 直接运行
-
-```shell
-# 1. 设置好上述环境变量
-export DOUBAN_USER_ID=12345  # ...
-# 2. 执行脚本
-python3 main.py
-```
-
-#### docker运行
-
 该docker镜像会在 `8-23点` 每隔 `5分钟` 执行一次，`0-8点` `每个小时` 执行一次
 
 `docker-compose.yml`
