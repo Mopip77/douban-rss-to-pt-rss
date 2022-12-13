@@ -4,7 +4,7 @@ touch rss.log
 
 # inject env
 tmpfile=$(mktemp)
-cat <(env) CRON > $tmpfile
+cat <(env) config/CRON > $tmpfile
 
 crontab $tmpfile
 cron

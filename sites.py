@@ -6,4 +6,4 @@ def load_sites() -> dict:
     Returns:
         dict: site name -> site rss pattern
     """
-    return json.load(open('sites.json', 'r'))
+    return json.load(open('config/sites.json', 'r'))
