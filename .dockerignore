@@ -4,3 +4,4 @@
 !*.py
 !*.json
 !CRON
+!requirements.txt
