@@ -9,7 +9,7 @@ import re
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 DEFAULT_TITLE = "_"
-LAST_RECORD_TITLE_FILE = "last_record_title"
+LAST_RECORD_TITLE_FILE = "config/last_record_title"
 PT_SITES = set([x.strip() for x in os.getenv('SITES').split(",")])
 
 def handle_title(title: str):
