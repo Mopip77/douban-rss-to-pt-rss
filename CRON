@@ -1,2 +1,2 @@
-*/15 8-23 * * * python3 /app/main.py >> /app/rss.log 
-0 0-7 * * * python3 /app/main.py >> /app/rss.log
+*/15 8-23 * * * /usr/local/bin/python3 /app/main.py >> /app/rss.log 2>&1
+0 0-7 * * * /usr/local/bin/python3 /app/main.py >> /app/rss.log 2>&1
