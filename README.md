@@ -7,7 +7,7 @@
 
 | **豆瓣想看列表**       | **qb rss生成效果**                      |
 | ---------------------- | --------------------------------------- |
-| ![](images/douban.jpg) | ![](images/result.png)                  |
+| <img src="images/douban.jpg" width = "300" /> | ![](images/result.png)                  |
 |                        | 会按照`pt站/影片标题`的层级格式进行存储 |
 
 ## 需配置的环境变量
