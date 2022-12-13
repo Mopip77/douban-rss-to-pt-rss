@@ -56,7 +56,7 @@ services:
     volumes:
       - /path/to/your/config:/app/config
     environment:
-      - TZ=Asian/Shanghai
+      - TZ=Asia/Shanghai
       - DOUBAN_USER_ID=12345
       - SITES=tjupt,mteam
       - QB_URL=http://127.0.0.1:8083
