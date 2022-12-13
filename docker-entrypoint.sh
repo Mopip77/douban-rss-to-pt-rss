@@ -2,7 +2,11 @@
 
 touch rss.log
 
-crontab CRON
+# inject env
+tmpfile=$(mktemp)
+cat <(env) CRON > $tmpfile
+
+crontab $tmpfile
 cron
 
 tail -f rss.log

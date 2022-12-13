@@ -28,11 +28,12 @@ def handle_title(title: str):
             url = site_map[site].format(query=pre_handled_title, size=10, passkey=os.getenv(f"{site}_passkey"))
             # send to qb
             qbittorrent.add_folder(site)
+            logging.info(f"正在发送 [{title}] 在 <{site}> 的rss链接到qb")
             qbittorrent.add_rss(url, f"{site}\\{title}")
 
 def main():
     logging.info(f"----- rss脚本开始执行 -------")
-    douban_rss_content = douban.crawl_douban_rss(os.environ.get('DOUBAN_USER_ID'))
+    douban_rss_content = douban.crawl_douban_rss(os.getenv('DOUBAN_USER_ID'))
     wanna_watch_titles = douban.parse_douban_rss(douban_rss_content)
     # load last record title
     if not os.path.exists(LAST_RECORD_TITLE_FILE):
@@ -45,7 +46,6 @@ def main():
     handled = False
     for title in wanna_watch_titles:
         if not handled and last_record_title != title:
-            logging.info(f"正在发送 [{title}] 在 <{os.environ.get('PT')}> 的rss链接到qb")
             handle_title(title)
         else:
             logging.info(f"跳过 [{title}] ，之前已被处理")

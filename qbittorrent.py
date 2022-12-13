@@ -25,8 +25,6 @@ def add_folder(folder: str):
     resp = requests.post(f"{os.getenv('QB_URL')}/api/v2/rss/addFolder", data=data, cookies=COOKIE)
     if resp.status_code != 200 and 'already exists' not in resp.text:
         logging.error(f"添加rss到qb失败, 返回值: {resp.text}")
-    else:
-        logging.info(f"成功添加rss文件夹 [{folder}]")
 
 def add_rss(rss_url: str, path: str):
     """add rss subscription

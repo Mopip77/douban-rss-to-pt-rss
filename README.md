@@ -32,13 +32,36 @@
 #### 直接运行
 
 ```shell
+# 1. 设置好上述环境变量
+export DOUBAN_USER_ID=12345  # ...
+# 2. 执行脚本
 python3 main.py
 ```
 
 #### docker运行
 
+该docker镜像会在 `8-23点` 每隔 `5分钟` 执行一次，`0-8点` `每个小时` 执行一次
+
 `docker-compose.yml`
 
 ```yaml
 version: 3
+
+services:
+  rss:
+    image: mopip77/douban-rss-to-pt-rss
+    container_name: douban-rss-to-pt-rss
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - /path/to/your/config:/app/config
+    environment:
+      - TZ=Asian/Shanghai
+      - DOUBAN_USER_ID=12345
+      - SITES=tjupt,mteam
+      - QB_URL=http://127.0.0.1:8083
+      - QB_USERNAME=username
+      - QB_PWD=password
+      - tjupt_passkey=0E43BD4F134F31BCB0C4
+      - mteam_passkey=6B6286D49D4F4E33D5EF
 ```
