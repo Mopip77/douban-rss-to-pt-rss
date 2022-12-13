@@ -31,6 +31,7 @@ def handle_title(title: str):
             qbittorrent.add_rss(url, f"{site}\\{title}")
 
 def main():
+    logging.info(f"----- rss脚本开始执行 -------")
     douban_rss_content = douban.crawl_douban_rss(os.environ.get('DOUBAN_USER_ID'))
     wanna_watch_titles = douban.parse_douban_rss(douban_rss_content)
     # load last record title

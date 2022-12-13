@@ -1,0 +1,2 @@
+*/15 8-23 * * * python3 /app/main.py >> /app/rss.log
+0 0-7 * * * python3 /app/main.py >> /app/rss.log
