@@ -25,7 +25,7 @@ async def handle_title(title: str):
     pre_handled_title = re.sub("[^0-9A-Za-z\u4e00-\u9fa5]", " ", title)
 
     if os.getenv('TELEGRAM_BOT_ENABLE') == 'true' and is_session_exists():
-        await send_to_bot(os.getenv('TELEGRAM_MESSAGE_TEMPLATE').format(title=title))
+        await send_to_bot(os.getenv('TELEGRAM_MESSAGE_TEMPLATE').format(title=title), wait_reply=False)
 
     for site in PT_SITES:
         if site not in site_map:
