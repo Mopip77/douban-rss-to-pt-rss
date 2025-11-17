@@ -1,1 +1,4 @@
 requests==2.25.1
+telethon==1.39.0
+python-dotenv==1.0.0
+PySocks==1.7.1

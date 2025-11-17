@@ -5,6 +5,8 @@ import logging
 import qbittorrent
 import sites
 import re
+import asyncio
+from telegram_client import send_to_bot, is_session_exists
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -12,7 +14,7 @@ DEFAULT_TITLE = "_"
 LAST_RECORD_TITLE_FILE = "config/last_record_title"
 PT_SITES = set([x.strip() for x in os.getenv('SITES').split(",")])
 
-def handle_title(title: str):
+async def handle_title(title: str):
     """convert title to rss subscription url, and send to qbittorrent
 
     Args:
@@ -21,6 +23,10 @@ def handle_title(title: str):
     site_map = sites.load_sites()
     # pre-handle, remove the puntuation for better match
     pre_handled_title = re.sub("[^0-9A-Za-z\u4e00-\u9fa5]", " ", title)
+
+    if os.getenv('TELEGRAM_BOT_ENABLE') == 'true' and is_session_exists():
+        await send_to_bot(os.getenv('TELEGRAM_MESSAGE_TEMPLATE').format(title=title))
+
     for site in PT_SITES:
         if site not in site_map:
             logging.warning(f"<{site}> 还不支持，跳过")
@@ -31,7 +37,7 @@ def handle_title(title: str):
             logging.info(f"正在发送 [{title}] 在 <{site}> 的rss链接到qb")
             qbittorrent.add_rss(url, f"{site}\\{title}")
 
-def main():
+async def main():
     logging.info(f"----- rss脚本开始执行 -------")
     douban_rss_content = douban.crawl_douban_rss(os.getenv('DOUBAN_USER_ID'))
     wanna_watch_titles = douban.parse_douban_rss(douban_rss_content)
@@ -46,7 +52,7 @@ def main():
     handled = False
     for title in wanna_watch_titles:
         if not handled and last_record_title != title:
-            handle_title(title)
+            await handle_title(title)
         else:
             logging.info(f"跳过 [{title}] ，之前已被处理")
             handled = True
@@ -56,4 +62,4 @@ def main():
         ff.write(newest_title)
             
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())

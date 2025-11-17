@@ -2,3 +2,4 @@
 *.xml
 last_record_title
 __pycache__/
+*.session
