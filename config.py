@@ -24,7 +24,7 @@ class Config:
     PROXY_PASSWORD = os.getenv('PROXY_PASSWORD')  # 代理密码（可选）
     
     # 会话文件配置
-    SESSION_NAME = 'telegram_bot_client'
+    SESSION_NAME = 'config/telegram_bot_client'
     
     # 超时配置
     MESSAGE_TIMEOUT = 30  # 等待回复的超时时间（秒）
